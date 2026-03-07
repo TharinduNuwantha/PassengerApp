@@ -75,7 +75,7 @@ class ErrorHandler {
     }
 
     // If it's a server error and we have a details string, append it for developers
-    String compose( String defaultMsg ) {
+    String compose(String defaultMsg) {
       if (details != null && details!.isNotEmpty) {
         return '$defaultMsg\nDetails: $details';
       }

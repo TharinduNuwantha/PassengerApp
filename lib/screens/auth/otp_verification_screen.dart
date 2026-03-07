@@ -173,9 +173,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
       final otpDebug = authProvider.lastOtp;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(otpDebug != null
-              ? 'New code sent! Check your SMS. (OTP: $otpDebug)'
-              : 'New code sent! Check your SMS.'),
+          content: Text(
+            otpDebug != null
+                ? 'New code sent! Check your SMS. (OTP: $otpDebug)'
+                : 'New code sent! Check your SMS.',
+          ),
           backgroundColor: AppColors.success,
           duration: const Duration(seconds: 5),
         ),
@@ -183,7 +185,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
     } else {
       final isRateLimit = authProvider.error?.contains('Too many') ?? false;
       final otpDebug = authProvider.lastOtp;
-      
+
       ErrorDialog.show(
         context: context,
         title: isRateLimit ? 'Too Many Requests' : 'Error',

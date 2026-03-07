@@ -50,7 +50,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
 
   Future<void> _checkFirstRun() async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     // Check ifintro seen or if user is authenticated
     final bool hasSeenIntro = prefs.getBool('has_seen_intro') ?? false;
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -109,9 +109,11 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       final otpDebug = authProvider.lastOtp;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(otpDebug != null
-              ? 'Verification code sent! Check your SMS. (OTP: $otpDebug)'
-              : 'Verification code sent! Check your SMS.'),
+          content: Text(
+            otpDebug != null
+                ? 'Verification code sent! Check your SMS. (OTP: $otpDebug)'
+                : 'Verification code sent! Check your SMS.',
+          ),
           backgroundColor: AppColors.success,
           duration: const Duration(seconds: 5),
         ),
@@ -125,7 +127,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     } else {
       final isRateLimit = authProvider.error?.contains('Too many') ?? false;
       final otpDebug = authProvider.lastOtp;
-      
+
       ErrorDialog.show(
         context: context,
         title: isRateLimit ? 'Too Many Requests' : 'Error',
@@ -202,25 +204,36 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                             IntlPhoneField(
                               controller: _phoneController,
                               style: const TextStyle(color: Colors.black),
-                              dropdownTextStyle: const TextStyle(color: Colors.black),
+                              dropdownTextStyle: const TextStyle(
+                                color: Colors.black,
+                              ),
                               inputFormatters: [NoLeadingZeroFormatter()],
                               cursorColor: AppColors.primary,
                               decoration: InputDecoration(
                                 hintText: 'Mobile Number',
-                                hintStyle: const TextStyle(color: Colors.black38),
+                                hintStyle: const TextStyle(
+                                  color: Colors.black38,
+                                ),
                                 filled: true,
                                 fillColor: Colors.grey.shade100,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(color: Colors.grey.shade300),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade300,
+                                  ),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(color: Colors.grey.shade300),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade300,
+                                  ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                                  borderSide: const BorderSide(
+                                    color: AppColors.primary,
+                                    width: 2,
+                                  ),
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 20,
@@ -264,8 +277,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 20)
-        
+                            const SizedBox(height: 20),
                           ],
                         ),
                       ),
