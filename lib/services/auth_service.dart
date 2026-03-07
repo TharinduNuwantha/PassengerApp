@@ -37,17 +37,38 @@ class AuthService {
 
         final data = response.data as Map<String, dynamic>;
 
+        // Development mode may return the OTP in the response
+        if (data.containsKey('otp')) {
+          _logger.w('🔐 DEBUG OTP (dev mode): ${data['otp']}');
+        }
+
         // Return response (production mode - no OTP in response)
         return {
           'success': true,
           'message': data['message'] as String? ?? 'OTP sent successfully',
+          if (data.containsKey('otp')) 'otp': data['otp'],
         };
       }
 
       throw 'Failed to send OTP';
     } catch (e) {
       _logger.e('Send OTP error: $e');
-      throw ErrorHandler.handleError(e);
+
+      // Check if the error response contains an OTP (for debugging when SMS fails)
+      String? otpFromError;
+      if (e is DioException && e.response?.data is Map<String, dynamic>) {
+        final errorData = e.response!.data as Map<String, dynamic>;
+        if (errorData.containsKey('otp')) {
+          otpFromError = errorData['otp']?.toString();
+          _logger.w('🔐 OTP from error response: $otpFromError');
+        }
+      }
+
+      final errorMessage = ErrorHandler.handleError(e);
+      throw {
+        'error': errorMessage,
+        if (otpFromError != null) 'otp': otpFromError,
+      };
     }
   }
 

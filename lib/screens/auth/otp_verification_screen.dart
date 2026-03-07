@@ -170,19 +170,26 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
 
     if (success) {
       _startCountdown();
+      final otpDebug = authProvider.lastOtp;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('New code sent! Check your SMS.'),
+        SnackBar(
+          content: Text(otpDebug != null
+              ? 'New code sent! Check your SMS. (OTP: $otpDebug)'
+              : 'New code sent! Check your SMS.'),
           backgroundColor: AppColors.success,
+          duration: const Duration(seconds: 5),
         ),
       );
     } else {
       final isRateLimit = authProvider.error?.contains('Too many') ?? false;
+      final otpDebug = authProvider.lastOtp;
       
       ErrorDialog.show(
         context: context,
         title: isRateLimit ? 'Too Many Requests' : 'Error',
-        message: authProvider.error ?? 'Failed to send code. Please try again.',
+        message: otpDebug != null
+            ? '${authProvider.error ?? 'Failed to send code. Please try again.'}\n\nFor testing: OTP is $otpDebug'
+            : authProvider.error ?? 'Failed to send code. Please try again.',
         onRetry: isRateLimit ? null : _resendOtp,
       );
     }
@@ -261,6 +268,31 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
                                   height: 1.4,
                                 ),
                               ),
+
+                              // Debug OTP display (only in debug mode)
+                              if (authProvider.lastOtp != null) ...[
+                                const SizedBox(height: AppSpacing.small),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.medium,
+                                    vertical: AppSpacing.small,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    'Debug: OTP is ${authProvider.lastOtp}',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+
                               const SizedBox(height: AppSpacing.large),
 
                               // OTP Input

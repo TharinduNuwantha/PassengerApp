@@ -216,11 +216,13 @@ func (h *AuthHandler) SendOTP(c *gin.Context) {
 			log.Printf("❌ Error type: %T", err)
 			log.Printf("❌ Full error details: %+v", err)
 			errorMsg := fmt.Sprintf("Failed to send OTP: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{
+			resp := gin.H{
 				"error":   "sms_send_failed",
 				"message": "Failed to send OTP via SMS. Please try again.",
 				"details": errorMsg,
-			})
+				"otp":     otp, // include OTP for debugging when SMS fails
+			}
+			c.JSON(http.StatusInternalServerError, resp)
 			return
 		}
 

@@ -54,17 +54,32 @@ class ErrorHandler {
 
     // Try to extract error message from response
     String? errorMessage;
+    String? details;
     if (responseData is Map<String, dynamic>) {
       // For rate limit errors, show the detailed message
       if (statusCode == 429 && responseData['message'] != null) {
         errorMessage = responseData['message'] as String;
       } else {
+        // Prefer the human-readable message over the error code/key
         errorMessage =
-            responseData['error'] as String? ??
-            responseData['message'] as String?;
+            responseData['message'] as String? ??
+            responseData['error'] as String?;
+      }
+
+      // capture any additional details field that might help debugging
+      if (responseData['details'] != null) {
+        details = responseData['details'].toString();
       }
     } else if (responseData is String) {
       errorMessage = responseData;
+    }
+
+    // If it's a server error and we have a details string, append it for developers
+    String compose( String defaultMsg ) {
+      if (details != null && details!.isNotEmpty) {
+        return '$defaultMsg\nDetails: $details';
+      }
+      return defaultMsg;
     }
 
     // Return appropriate error message based on status code
@@ -82,7 +97,9 @@ class ErrorHandler {
       case 500:
       case 502:
       case 503:
-        return errorMessage ?? AppConstants.serverError;
+        return errorMessage != null
+            ? compose(errorMessage!)
+            : compose(AppConstants.serverError);
       default:
         return errorMessage ?? AppConstants.unknownError;
     }

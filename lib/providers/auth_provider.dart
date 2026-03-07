@@ -15,12 +15,16 @@ class AuthProvider extends ChangeNotifier {
   UserModel? _user;
   String? _phoneNumber;
 
+  // last OTP returned by the backend (development/debug only)
+  String? _lastOtp;
+
   // Getters
   bool get isAuthenticated => _isAuthenticated;
   bool get isLoading => _isLoading;
   String? get error => _error;
   UserModel? get user => _user;
   String? get phoneNumber => _phoneNumber;
+  String? get lastOtp => _lastOtp;
 
   // Check authentication status on app start
   Future<void> checkAuthStatus() async {
@@ -73,6 +77,13 @@ class AuthProvider extends ChangeNotifier {
 
       if (result['success'] == true) {
         _logger.i('OTP sent successfully');
+        if (result.containsKey('otp')) {
+          // show or log OTP for development
+          _lastOtp = result['otp']?.toString();
+          _logger.w('🔐 OTP for testing: $_lastOtp');
+        } else {
+          _lastOtp = null;
+        }
         return true;
       }
 
@@ -80,8 +91,19 @@ class AuthProvider extends ChangeNotifier {
       return false;
     } catch (e) {
       _logger.e('Send OTP error: $e');
-      // The error is already a formatted string from ErrorHandler
-      _error = e is String ? e : e.toString();
+
+      // Handle new error format that might include OTP
+      if (e is Map<String, dynamic>) {
+        _error = e['error'] as String? ?? 'Failed to send OTP';
+        if (e.containsKey('otp')) {
+          _lastOtp = e['otp']?.toString();
+          _logger.w('🔐 OTP from error response: $_lastOtp');
+        }
+      } else {
+        // The error is already a formatted string from ErrorHandler
+        _error = e is String ? e : e.toString();
+        _lastOtp = null;
+      }
       return false;
     } finally {
       _isLoading = false;

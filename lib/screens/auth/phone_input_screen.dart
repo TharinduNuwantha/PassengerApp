@@ -106,11 +106,14 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
 
     if (success) {
       // Show success message
+      final otpDebug = authProvider.lastOtp;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Verification code sent! Check your SMS.'),
+        SnackBar(
+          content: Text(otpDebug != null
+              ? 'Verification code sent! Check your SMS. (OTP: $otpDebug)'
+              : 'Verification code sent! Check your SMS.'),
           backgroundColor: AppColors.success,
-          duration: Duration(seconds: 3),
+          duration: const Duration(seconds: 5),
         ),
       );
 
@@ -121,11 +124,14 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       );
     } else {
       final isRateLimit = authProvider.error?.contains('Too many') ?? false;
+      final otpDebug = authProvider.lastOtp;
       
       ErrorDialog.show(
         context: context,
         title: isRateLimit ? 'Too Many Requests' : 'Error',
-        message: authProvider.error ?? 'Failed to send verification code',
+        message: otpDebug != null
+            ? '${authProvider.error ?? 'Failed to send verification code'}\n\nFor testing: OTP is $otpDebug'
+            : authProvider.error ?? 'Failed to send verification code',
         onRetry: isRateLimit ? null : _sendOtp,
       );
     }
